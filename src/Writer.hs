@@ -8,27 +8,50 @@ someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
 
-test1 ::IO ()
-test1 = func1
+test1 :: IO ()
+test1 = f
+  where
+    f :: IO ()
+    f = do
+      func1
+      func1
+      func1
 
 func1 :: IO ()
 func1 = do
-  write "abc\n"
-  write "def\n"
-  write "ghi\n"
+  putStr "abc\n"
+  putStr "def\n"
+  putStr "ghi\n"
+
+
+
+test2 :: IO ()
+test2 = putStr =<< f
   where
-    write :: String -> IO ()
-    write s = putStr s
+    f :: IO String
+    f = do
+      s1 <- func2
+      s2 <- func2
+      s3 <- func2
+      return $ mconcat [s1,s2,s3]
+
+func2 :: IO String
+func2 =
+  return $ mconcat ["abc\n","def\n","ghi\n"]
 
 
-test2 ::IO ()
-test2 =  putStr =<< execWriterT func2
+
+test3 :: IO ()
+test3 = putStr =<< execWriterT f
+  where
+    f :: WriterT String IO ()
+    f = do
+      func3
+      func3
+      func3
   
-func2 :: WriterT String IO ()
-func2 = do
-  write "abc\n"
-  write "def\n"
-  write "ghi\n"
-  where
-    write :: String -> WriterT String IO ()
-    write s = tell s
+func3 :: WriterT String IO ()
+func3 = do
+  tell "abc\n"
+  tell "def\n"
+  tell "ghi\n"
